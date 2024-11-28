@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <AssemblyName>SqlBuilder</AssemblyName>
+        <PackageId>Kvr.SqlBuilder</PackageId>
+        <Title>Sql Builder</Title>
+        <Description>An simple Sql builder to genreate SQL.</Description>
+        <TargetFrameworks>netstandard2.0;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
+        <LangVersion>10.0</LangVersion>
+        <Authors>Guang Huang</Authors>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>Kvr.SqlBuilder</RootNamespace>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <RepositoryType>git</RepositoryType>
+        <PackageProjectUrl>https://github.com/guanghuang/SqlBuilder</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/guanghuang/SqlBuilder</RepositoryUrl>
+        <PackageTags>Query;Sql;SqlBuilder</PackageTags>
+        <Nullable>enable</Nullable>
+        <Version>0.0.1</Version>
+        <Copyright>Copyright © 2024 Kvr.SqlBuilder. All rights reserved.</Copyright>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="../../License.txt">
+            <Pack>true</Pack>
+            <PackagePath></PackagePath>
+            <Visible>True</Visible>
+        </None>
+        <None Include="../../README.md">
+            <Pack>true</Pack>
+            <PackagePath></PackagePath>
+            <Visible>True</Visible>
+        </None>
+    </ItemGroup>
+</Project>
