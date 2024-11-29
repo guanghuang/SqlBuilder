@@ -184,7 +184,7 @@ builder
 - Consider query performance when building complex JOINs
 
 ## Limitations
-1. Limited support for complex subqueries
+1. Limited support for complex subqueries (could use RawSql methods for this)
 2. No direct support for GROUP BY and HAVING clauses
 3. No NamingConvention support for table and column (e.g. SnakeCase, PascalCase for table and column names)
 
@@ -195,6 +195,10 @@ builder
 - .NET 7.0+
 
 ## Version History
+- 1.1.0
+    - Add RawSql methods (Where, And, Or, OrderBy) and AppendRawSql method
+    - Change parameter type from LambdaExpression to Expression<Func<T, object>> for strongly-typed expressions
+
 - 1.0.0
     - Initial release
     - Basic SQL query building
