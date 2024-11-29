@@ -146,6 +146,21 @@ public class SqlBuilder
         tableAliasIndex++;
         return newPrefix;
     }
+    
+    /// <summary>
+    /// Adds a SELECT * clause for a type, with options to exclude specific columns and specify a first column. 
+    /// </summary>
+    /// <typeparam name="T">The entity type</typeparam>
+    /// <param name="excludeColumns">Columns to exclude from the selection</param>
+    /// <param name="firstColumn">Column to place first in the selection</param>
+    /// <param name="prefix">Optional table prefix/alias</param>
+    /// <returns>The current SqlBuilder instance for method chaining</returns>
+    public SqlBuilder SelectAll<T>(Expression<Func<T, object>>[]? excludeColumns, Expression<Func<T, object>>? firstColumn, string? prefix = null)
+    {
+        prefix ??= GetTablePrefix(typeof(T), false);
+        AppendSelect(Utils.GenerateSelectAllColumns(typeof(T), isSqlServer, excludeColumns, firstColumn, prefix));
+        return this;
+    }
 
     /// <summary>
     /// Adds a SELECT * clause for a type, with options to exclude specific columns.
@@ -155,47 +170,21 @@ public class SqlBuilder
     /// <param name="firstColumn">Column to place first in the selection</param>
     /// <param name="prefix">Output parameter for the generated table prefix</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder SelectAll<T>(LambdaExpression[]? excludeColumns, LambdaExpression? firstColumn, out string prefix)
+    public SqlBuilder SelectAll<T>(Expression<Func<T, object>>[]? excludeColumns, Expression<Func<T, object>>? firstColumn, out string prefix)
     {
         prefix = GetTablePrefix(typeof(T), true);
         AppendSelect(Utils.GenerateSelectAllColumns(typeof(T), isSqlServer, excludeColumns, firstColumn, prefix));
         return this;
     }
 
+
     /// <summary>
     /// Adds a SELECT * clause for a type, excluding specific columns.
     /// </summary>
     /// <typeparam name="T">The entity type</typeparam>
     /// <param name="excludeColumns">Columns to exclude from the selection</param>
-    /// <param name="prefix">Output parameter for the generated table prefix</param>
+    /// <param name="prefix">Optional table prefix/alias</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder SelectAll<T>(LambdaExpression[]? excludeColumns, out string prefix)
-    {
-        return SelectAll<T>(excludeColumns, null, out prefix);
-    }
-    
-    /// <summary>
-    /// Adds a SELECT * clause for a type, with options to exclude specific columns and specify a first column.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="excludeColumns"></param>
-    /// <param name="firstColumn"></param>
-    /// <param name="prefix"></param>
-    /// <returns></returns>
-    public SqlBuilder SelectAll<T>(Expression<Func<T, object>>[]? excludeColumns, Expression<Func<T, object>>? firstColumn, string? prefix = null)
-    {
-        prefix ??= GetTablePrefix(typeof(T), false);
-        AppendSelect(Utils.GenerateSelectAllColumns(typeof(T), isSqlServer, excludeColumns, firstColumn, prefix));
-        return this;
-    }
-
-    /// <summary>
-    /// Adds a SELECT * clause for a type, excluding specific columns.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="excludeColumns"></param>
-    /// <param name="prefix"></param>
-    /// <returns></returns>
     public SqlBuilder SelectAll<T>(Expression<Func<T, object>>[]? excludeColumns, string? prefix = null)
     {
         return SelectAll<T>(excludeColumns, null, prefix);
@@ -204,9 +193,9 @@ public class SqlBuilder
     /// <summary>
     /// Adds a SELECT * clause for a type, with options to specify a first column.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="firstColumn"></param>
-    /// <param name="prefix"></param>
+    /// <typeparam name="T">The entity type</typeparam>
+    /// <param name="firstColumn">Column to place first in the selection</param>
+    /// <param name="prefix">Optional table prefix/alias</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
     public SqlBuilder SelectAll<T>(Expression<Func<T, object>>? firstColumn, out string prefix)
     {
@@ -360,14 +349,16 @@ public class SqlBuilder
     }
 
     /// <summary>
-    /// Adds a WHERE clause to the query.
+    /// Adds a WHERE clause to the query.   
     /// </summary>
+    /// <typeparam name="T">The entity type</typeparam>
+    /// <typeparam name="TResult">The column type</typeparam>
     /// <param name="expression">The column expression</param>
     /// <param name="value">The value to compare against</param>
     /// <param name="op">The comparison operator (defaults to "=")</param>
     /// <param name="prefix">Optional table prefix/alias</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder Where(LambdaExpression expression, string value, string op = "=", string? prefix = null)
+    public SqlBuilder Where<T, TResult>(Expression<Func<T, TResult>> expression, string value, string op = "=", string? prefix = null)
     {
         sqlBuilder.Append(" WHERE ");
         sqlBuilder.Append(Utils.EncodeColumn(Utils.GetColumnName(expression), isSqlServer, prefix, null, false));
@@ -376,20 +367,27 @@ public class SqlBuilder
     }
 
     /// <summary>
-    public SqlBuilder Where<T, TResult>(Expression<Func<T, TResult>> expression, string value, string op = "=", string? prefix = null)
+    /// Adds a WHERE clause to the query.
+    /// </summary>
+    /// <param name="rawSql">The raw SQL string</param>
+    /// <returns>The current SqlBuilder instance for method chaining</returns>
+    public SqlBuilder Where(string rawSql)
     {
-        return Where((LambdaExpression)expression, value, op, prefix);
+        sqlBuilder.Append(" WHERE ").Append(rawSql).AppendLine();
+        return this;
     }
 
     /// <summary>
     /// Adds an AND condition to the WHERE clause.
     /// </summary>
+    /// <typeparam name="T">The entity type</typeparam>
+    /// <typeparam name="TResult">The column type</typeparam>
     /// <param name="expression">The column expression</param>
     /// <param name="value">The value to compare against</param>
     /// <param name="op">The comparison operator (defaults to "=")</param>
     /// <param name="prefix">Optional table prefix/alias</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder And(LambdaExpression expression, string value, string op = "=", string? prefix = null)
+    public SqlBuilder And<T, TResult>(Expression<Func<T, TResult>> expression, string value, string op = "=", string? prefix = null)
     {
         sqlBuilder.Append(" AND ");
         sqlBuilder.Append(Utils.EncodeColumn(Utils.GetColumnName(expression), isSqlServer, prefix, null, false));
@@ -397,24 +395,14 @@ public class SqlBuilder
         return this;
     }
 
-    public SqlBuilder And<T, TResult>(Expression<Func<T, TResult>> expression, string value, string op = "=", string? prefix = null)
-    {
-        return And((LambdaExpression)expression, value, op, prefix);
-    }
-
     /// <summary>
-    /// Adds an OR condition to the WHERE clause.
+    /// Adds an AND condition to the WHERE clause.
     /// </summary>
-    /// <param name="expression">The column expression</param>
-    /// <param name="value">The value to compare against</param>
-    /// <param name="op">The comparison operator (defaults to "=")</param>
-    /// <param name="prefix">Optional table prefix/alias</param>
+    /// <param name="rawSql">The raw SQL string</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder Or(LambdaExpression expression, string value, string op = "=", string? prefix = null)
+    public SqlBuilder And(string rawSql)
     {
-        sqlBuilder.Append(" OR ");
-        sqlBuilder.Append(Utils.EncodeColumn(Utils.GetColumnName(expression), isSqlServer, prefix, null, false));
-        sqlBuilder.Append(" ").Append(op).Append(" ").Append(value).AppendLine();
+        sqlBuilder.Append(" AND ").Append(rawSql).AppendLine();
         return this;
     }
 
@@ -430,23 +418,23 @@ public class SqlBuilder
     /// <returns></returns>
     public SqlBuilder Or<T, TResult>(Expression<Func<T, TResult>> expression, string value, string op = "=", string? prefix = null)
     {
-        return Or((LambdaExpression)expression, value, op, prefix);
+        sqlBuilder.Append(" OR ");
+        sqlBuilder.Append(Utils.EncodeColumn(Utils.GetColumnName(expression), isSqlServer, prefix, null, false));
+        sqlBuilder.Append(" ").Append(op).Append(" ").Append(value).AppendLine();
+        return this;
     }
 
     /// <summary>
-    /// Adds an ORDER BY clause to the query.
+    /// Adds an OR condition to the WHERE clause.
     /// </summary>
-    /// <param name="expression">The column expression to order by</param>
-    /// <param name="ascOrder">Whether to order ascending (true) or descending (false)</param>
-    /// <param name="prefix">Optional table prefix/alias</param>
+    /// <param name="rawSql">The raw SQL string</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder OrderBy(LambdaExpression expression, bool ascOrder = true, string? prefix = null)
+    public SqlBuilder Or(string rawSql)
     {
-        sqlBuilder.Append(" ORDER BY ");
-        sqlBuilder.Append(Utils.EncodeColumn(Utils.GetColumnName(expression), isSqlServer, prefix, null, false));
-        sqlBuilder.Append(" ").Append(ascOrder ? "ASC" : "DESC").AppendLine();
+        sqlBuilder.Append(" OR ").Append(rawSql).AppendLine();
         return this;
     }
+
 
     /// <summary>
     /// Adds an ORDER BY clause to the query.
@@ -459,7 +447,21 @@ public class SqlBuilder
     /// <returns></returns>
     public SqlBuilder OrderBy<T, TResult>(Expression<Func<T, TResult>> expression, bool ascOrder = true, string? prefix = null)
     {
-        return OrderBy((LambdaExpression)expression, ascOrder, prefix);
+        sqlBuilder.Append(" ORDER BY ");
+        sqlBuilder.Append(Utils.EncodeColumn(Utils.GetColumnName(expression), isSqlServer, prefix, null, false));
+        sqlBuilder.Append(" ").Append(ascOrder ? "ASC" : "DESC").AppendLine();
+        return this;
+    }
+
+    /// <summary>
+    /// Adds an ORDER BY clause to the query.
+    /// </summary>
+    /// <param name="rawSql">The raw SQL string</param>
+    /// <returns>The current SqlBuilder instance for method chaining</returns>
+    public SqlBuilder OrderBy(string rawSql, bool ascOrder = true)
+    {
+        sqlBuilder.Append(" ORDER BY ").Append(rawSql).Append(" ").Append(ascOrder ? "ASC" : "DESC").AppendLine();
+        return this;
     }
 
     /// <summary>
@@ -539,6 +541,17 @@ public class SqlBuilder
     {
         sqlBuilder.Append(" FULL JOIN ");
         return BuildJoinClause(left, right, leftPrefix, rightPrefix, op);
+    }
+
+    /// <summary>
+    /// Appends raw SQL to the query.
+    /// </summary>
+    /// <param name="rawSql">The raw SQL string</param>
+    /// <returns>The current SqlBuilder instance for method chaining</returns>
+    public SqlBuilder AppendRawSql(string rawSql)
+    {
+        sqlBuilder.Append(rawSql);
+        return this;
     }
 
     /// <summary>
