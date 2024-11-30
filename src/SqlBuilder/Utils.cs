@@ -1,12 +1,16 @@
+// Copyright © 2024 Kvr.SqlBuilder. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE file in the project root for full license information.
+
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Expressions;
 using System.Reflection;
+using Kvr.SqlBuilder.Convention;
 
 namespace kvr.SqlBuilder;
 
 /// <summary>
 /// Provides utility methods for SQL query building operations, including table and column name resolution,
-/// SQL encoding, and type mapping functionality.
+/// SQL encoding, and type mapping functionality. Supports customizable naming conventions through INameConvention.
 /// </summary>
 public static class Utils
 {
@@ -49,31 +53,12 @@ public static class Utils
     };
 
     /// <summary>
-    /// Gets the table name for a given type, considering TableAttribute decorations and pluralization settings.
-    /// </summary>
-    /// <param name="type">The type to get the table name for</param>
-    /// <param name="isPluralTableNames">Whether to pluralize table names when no explicit name is provided</param>
-    /// <param name="overrideName">Optional override name that takes precedence if provided</param>
-    /// <returns>The resolved table name</returns>
-    public static string GetTableName(Type type, bool isPluralTableNames, string? overrideName = null)
-    {
-        if (overrideName != null)
-            return overrideName;
-
-        var tableAttr = type.GetCustomAttributes(typeof(TableAttribute), false).FirstOrDefault() as TableAttribute;
-        if (tableAttr != null)
-            return tableAttr.Name;
-
-        return isPluralTableNames ? $"{type.Name}s" : type.Name;
-    }
-
-    /// <summary>
     /// Extracts the column name from a lambda expression, considering ColumnAttribute decorations.
     /// </summary>
     /// <param name="expression">Lambda expression pointing to a property</param>
     /// <returns>The resolved column name</returns>
     /// <exception cref="ArgumentException">Thrown when the expression is not a property expression</exception>
-    public static string GetColumnName(LambdaExpression expression)
+    private static string GetColumnName(LambdaExpression expression)
     {
         var propertyInfo = GetMemberExpression(expression).Member as PropertyInfo;
         if (propertyInfo == null)
@@ -96,14 +81,15 @@ public static class Utils
     
     /// <summary>
     /// Generates a SQL SELECT clause for all columns of a given type, with options for exclusions and ordering.
+    /// Uses the provided naming convention for column name formatting.
     /// </summary>
     /// <param name="type">The type to generate columns for</param>
-    /// <param name="isSqlServer">Whether the target database is SQL Server</param>
+    /// <param name="nameConvention">The naming convention to use for formatting</param>
     /// <param name="excludeColumns">Optional array of columns to exclude</param>
     /// <param name="firstColumn">Optional column to place first in the selection</param>
     /// <param name="prefix">Optional prefix for column names (e.g., table alias)</param>
     /// <returns>A comma-separated list of encoded column names</returns>
-    public static string GenerateSelectAllColumns(Type type, bool isSqlServer, LambdaExpression[]? excludeColumns = null, LambdaExpression? firstColumn = null, string? prefix = null)
+    public static string GenerateSelectAllColumns(Type type, INameConvention nameConvention, LambdaExpression[]? excludeColumns = null, LambdaExpression? firstColumn = null, string? prefix = null)
     {
         var excludeColumnNames = excludeColumns?.Select(e => e.GetMemberExpression().Member.Name).ToArray() ?? Array.Empty<string>();
         var firstColumnName = firstColumn?.GetMemberExpression().Member.Name;
@@ -111,20 +97,20 @@ public static class Utils
         var orderedProperties = properties
             .Where(p => MappingTypes.Contains(p.PropertyType) && !excludeColumnNames.Contains(p.Name))
             .OrderBy(p => firstColumnName != null && p.Name == firstColumnName ? 0 : 1);
-        var columns = orderedProperties.Select(p => EncodeColumn(GetColumnName(p), isSqlServer, prefix, p.Name, true));
+        var columns = orderedProperties.Select(p => EncodeColumn(p, nameConvention, prefix, nameConvention.EscapeIdentifierName(p.Name), true));
         return string.Join(", ", columns);
     }
 
     /// <summary>
-    /// Generates a SQL SELECT clause for specified columns.
+    /// Generates a SQL SELECT clause for specified columns using the provided naming convention.
     /// </summary>
-    /// <param name="isSqlServer">Whether the target database is SQL Server</param>
+    /// <param name="nameConvention">The naming convention to use for formatting</param>
     /// <param name="columns">Array of lambda expressions selecting the desired columns</param>
     /// <param name="prefix">Optional prefix for column names (e.g., table alias)</param>
     /// <returns>A comma-separated list of encoded column names</returns>
-    public static string GenerateSelectColumns(bool isSqlServer, LambdaExpression[] columns, string? prefix = null)
+    public static string GenerateSelectColumns(INameConvention nameConvention, LambdaExpression[] columns, string? prefix = null)
     {
-        return string.Join(", ", columns.Select(c => EncodeColumn(GetColumnName(c), isSqlServer, prefix, null, true)));
+        return string.Join(", ", columns.Select(c => EncodeColumn(c, nameConvention, prefix, null, true)));
     }
 
     /// <summary>
@@ -133,7 +119,7 @@ public static class Utils
     /// <param name="expression">The lambda expression to process</param>
     /// <returns>The extracted MemberExpression</returns>
     /// <exception cref="ArgumentException">Thrown when the expression cannot be converted to a MemberExpression</exception>
-    public static MemberExpression GetMemberExpression(this LambdaExpression expression)
+    private static MemberExpression GetMemberExpression(this LambdaExpression expression)
     {
         var memberExpression = expression.Body as MemberExpression;
         if (memberExpression == null && expression.Body is UnaryExpression unaryExpression)
@@ -148,37 +134,80 @@ public static class Utils
     }
 
     /// <summary>
-    /// Encodes a table name according to the target database syntax, optionally adding an alias.
+    /// Encodes a table name with an optional alias.
     /// </summary>
     /// <param name="tableName">The table name to encode</param>
-    /// <param name="isSqlServer">Whether the target database is SQL Server</param>
     /// <param name="alias">Optional alias for the table</param>
     /// <returns>The encoded table name with optional alias</returns>
-    public static string EncodeTable(string tableName, bool isSqlServer, string? alias = null)
+    public static string EncodeTable(string tableName, string? alias = null)
     {
-        var encoded = isSqlServer ? $"[{tableName}]" : $"{tableName}";
-        return alias == null ? encoded : $"{encoded} {alias}";
+        return alias == null ? tableName : $"{tableName} {alias}";
     }
 
     /// <summary>
-    /// Encodes a column name according to the target database syntax, with options for prefixing and aliasing.
+    /// Encodes a table name for a given type using the provided naming convention.
+    /// Considers TableAttribute decorations and allows for name overrides.
     /// </summary>
-    /// <param name="columnName">The column name to encode</param>
-    /// <param name="isSqlServer">Whether the target database is SQL Server</param>
+    /// <param name="type">The type to get the table name for</param>
+    /// <param name="nameConvention">The naming convention to use for formatting</param>
+    /// <param name="overrideName">Optional override name that takes precedence if provided</param>
+    /// <param name="alias">Optional alias for the table</param>
+    /// <returns>The encoded table name with optional alias</returns>
+    public static string EncodeTable(Type type, INameConvention nameConvention, string? overrideName = null, string? alias = null)
+    {
+        if (overrideName != null)
+            return alias == null ? overrideName : $"{overrideName} {alias}";
+
+        var tableAttr = type.GetCustomAttributes(typeof(TableAttribute), false).FirstOrDefault() as TableAttribute;
+        var tableName = nameConvention.EscapeIdentifierName(tableAttr?.Name) ?? nameConvention.ToTableName(type.Name);
+        return alias == null ? tableName : $"{tableName} {alias}";
+    }
+
+    /// <summary>
+    /// Encodes a column name from a lambda expression using the provided naming convention.
+    /// </summary>
+    /// <param name="propertyExpression">The property expression identifying the column</param>
+    /// <param name="nameConvention">The naming convention to use for formatting</param>
     /// <param name="prefix">Optional prefix for the column name</param>
     /// <param name="alias">Optional alias for the column</param>
     /// <param name="isAs">Whether to include AS keyword for aliasing</param>
-    /// <returns>The encoded column name with optional prefix and alias</returns>
-    public static string EncodeColumn(string columnName, bool isSqlServer, string? prefix, string? alias, bool isAs)
+    /// <returns>The encoded column name</returns>
+    public static string EncodeColumn(LambdaExpression propertyExpression, INameConvention nameConvention, string? prefix, string? alias, bool isAs)
     {
-        var prefixWithDot = prefix == null ? "" : $"{prefix}.";
-        var encoded = isSqlServer ? $"{prefixWithDot}[{columnName}]" : $"{prefixWithDot}{columnName}";
-        var asName = alias ?? columnName;
-        if (isAs)
-        {
-            return $"{encoded} AS {(isSqlServer ? $"[{asName}]" : asName)}";
-        }
+        var propertyInfo = GetMemberExpression(propertyExpression).Member as PropertyInfo;
+        if (propertyInfo == null)
+            throw new ArgumentException("Expression must be a property");
 
-        return encoded;
+        return EncodeColumn(propertyInfo, nameConvention, prefix, alias, isAs);
+    }
+
+    /// <summary>
+    /// Encodes a column name from a PropertyInfo using the provided naming convention.
+    /// </summary>
+    /// <param name="propertyInfo">The property info identifying the column</param>
+    /// <param name="nameConvention">The naming convention to use for formatting</param>
+    /// <param name="prefix">Optional prefix for the column name</param>
+    /// <param name="alias">Optional alias for the column</param>
+    /// <param name="isAs">Whether to include AS keyword for aliasing</param>
+    /// <returns>The encoded column name</returns>
+    private static string EncodeColumn(PropertyInfo propertyInfo, INameConvention nameConvention, string? prefix, string? alias, bool isAs)
+    {
+        var columnAttr = propertyInfo.GetCustomAttributes(typeof(ColumnAttribute), false).FirstOrDefault() as ColumnAttribute;
+        var columnName = nameConvention.EscapeIdentifierName(columnAttr?.Name) ?? nameConvention.ToColumnName(propertyInfo.Name);
+        return EncodeColumn(columnName, prefix, alias, isAs);
+    }
+
+    /// <summary>
+    /// Encodes a column name with optional prefix and alias.
+    /// </summary>
+    /// <param name="columnName">The column name to encode</param>
+    /// <param name="prefix">Optional prefix for the column name</param>
+    /// <param name="alias">Optional alias for the column</param>
+    /// <param name="isAs">Whether to include AS keyword for aliasing</param>
+    /// <returns>The encoded column name</returns>
+    public static string EncodeColumn(string columnName, string? prefix, string? alias, bool isAs)
+    {
+        var encoded = prefix == null ? columnName : $"{prefix}.{columnName}";
+        return isAs ? $"{encoded} AS {alias ?? columnName}" : encoded;
     }
 }
