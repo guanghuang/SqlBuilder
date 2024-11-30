@@ -2,20 +2,20 @@
 
 Copyright © 2024 Kvr.SqlBuilder. All rights reserved.
 
-A lightweight, fluent SQL query builder for .NET that provides type-safe SQL query construction with support for table aliases, column selection, and complex joins. With Table and Column attributes annotations support.
+A lightweight, fluent SQL query builder for .NET that provides type-safe SQL query construction with support for table aliases, column selection, and complex joins. With Table and Column attributes annotations support. RawSql methods support for appending raw sql script to builder. Could be used with [Dapper](https://github.com/DapperLib/Dapper), [NPoco](https://github.com/schotime/NPoco), etc.
 
 ## Table of Contents
 - [Features](#features)
 - [Installation](#installation)
 - [Quick Start Guide](#quick-start-guide)
-    - [Basic Usage](#basic-usage)
-    - [Advanced Queries](#advanced-queries)
 - [Usage](#usage)
     - [Table Names](#table-names)
     - [Column Selection](#column-selection)
     - [Joins](#joins)
     - [Where Clauses](#where-clauses)
     - [Order By](#order-by)
+    - [Naming Conventions](#naming-conventions)    
+    - [Raw Sql](#rawsql)
 - [Best Practices](#best-practices)
 - [Limitations](#limitations)
 - [Supported Frameworks](#supported-frameworks)
@@ -176,6 +176,63 @@ builder
     .Or<Customer>(c => c.Email, "'john@example.com'");
 ```
 
+### NameConvention
+
+SqlBuilder supports custom naming conventions which implements INameConvention interface:
+
+```csharp
+SqlBuilder.UseGlobalNameConvention(new CustomNameConvention());
+```
+There are two built-in naming conventions: DefaultNameConvention and SnakeCaseNameConvention. Both of them have `UseSqlServer` property to specify whether to use SQL Server specific syntax to escape identifiers with square brackets and `UsePlural` property to specify whether to use plural table names.
+
+#### Table Name determination priority:
+1. Custom table name mapping (Highest priority)
+  * using MapGlobalTable or MapTable method to map table names which could not inherit from CustomNameConvention
+  ```csharp
+  // Global mapping
+  SqlBuilder.MapGlobalTable<Customer>("tbl_customers");
+  // or instance-specific mapping
+  this.sqlBuilder.MapTable<Customer>("tbl_customers");
+  ```
+2. `TableAttribute` on the entity class to specify the table name
+  ```csharp
+  [Table("tbl_customers")]
+  public class Customer
+  ```
+3. `ToTableName` method in CustomNameConvention to convert the table name
+  ```csharp
+  protected override string ToTableName(string typeName)
+  ```
+
+#### Column Name determination priority:
+1. Custom column name sepecified in `Select` method (Highest priority)
+    ```csharp   
+    this.sqlBuilder.Select<Customer>("customer_id", "Name");
+    ```
+2. `ColumnAttribute` on the property to specify the column name
+    ```csharp
+    [Column("customer_id")]
+    public int Id { get; set; }
+    ```
+3. `ToColumnName` method in CustomNameConvention to convert the column name
+    ```csharp
+    protected override string ToColumnName(string propertyName)
+    ```
+
+### RawSql
+
+SqlBuilder supports RawSql methods to build WHERE, AND, OR, ORDER BY clauses, also `RawSql` methods to append raw sql script to builder:
+
+```csharp
+builder.SelectAll<Customer>().RawSql(", count(*) as TotalCount") // append total count of customers to the result
+    .Where<Customer>(c => c.Email, "@customerEmail") // using parameter
+    .Or<Customer>("@customerEmail is null") // using raw sql string for parameter condition
+    .OrderBy<Customer>("Id desc")
+    .RawSql(" having count(*) > 0") // using raw sql string for having clause
+    .Build();
+// Result: SELECT [Id], [Name], [Email], count(*) as TotalCount FROM [Customers] WHERE [Email] = @customerEmail OR @customerEmail is null ORDER BY Dd desc having count(*) > 0
+``` 
+
 ## Best Practices
 - Use strongly-typed expressions when possible
 - Leverage table aliases for complex queries
@@ -195,6 +252,10 @@ builder
 - .NET 7.0+
 
 ## Version History
+
+- 1.2.0
+    - Add NameConvention support
+
 - 1.1.0
     - Add RawSql methods (Where, And, Or, OrderBy) and AppendRawSql method
     - Change parameter type from LambdaExpression to Expression<Func<T, object>> for strongly-typed expressions
@@ -222,7 +283,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Dependencies
 
-None. This is a standalone library.
+`System.ComponentModel.Annotations` for Table and Column attributes
 
 ## Support
 
