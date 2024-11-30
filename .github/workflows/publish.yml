@@ -9,6 +9,10 @@ on:
     
 jobs:
   publish:
+    permissions:
+      packages: write # Permission to publish packages
+      contents: read # Permission to read repository contents    
+    
     runs-on: ubuntu-latest
     
     steps:
@@ -34,6 +38,14 @@ jobs:
       
     - name: Pack
       run: dotnet pack --configuration Release --no-build --output nupkgs
+
+      # Add source for GitHub Packages
+    - name: Add GitHub Source
+      run: dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+      
+      # Publish to GitHub Packages
+    - name: Publish to GitHub Packages
+      run: dotnet nuget push "./nupkgs/*.nupkg" --source "github" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
       
     - name: Publish to NuGet
       run: dotnet nuget push "./nupkgs/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
