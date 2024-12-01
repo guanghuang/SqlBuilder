@@ -4,7 +4,17 @@ on:
   push:
     tags:
       - 'v*'
-
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag version'
+        required: true
+        type: string
+      ref:
+        description: 'Git ref to build from'
+        required: false
+        type: string
+        default: 'main'
 jobs:
   publish:
     permissions:
@@ -13,6 +23,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref || github.ref }}  # Use the provided ref or default to github.ref
+          fetch-depth: 0  # Fetch all history for tags
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
@@ -49,7 +62,12 @@ jobs:
       - name: Get Release Notes
         id: get_release_notes
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
+          # Get version from inputs or ref
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ inputs.tag }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/v}
+          fi
           if [ -f README.md ]; then
             {
               echo 'NOTES<<EOF'
@@ -67,6 +85,7 @@ jobs:
           name: ${{ steps.get_release_notes.outputs.VERSION }}
           draft: false
           prerelease: false
+          tag_name: ${{ inputs.tag || github.ref_name }}
           body: |
             ## Release Notes
             ${{ steps.get_release_notes.outputs.NOTES }}
