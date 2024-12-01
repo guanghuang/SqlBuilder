@@ -252,7 +252,9 @@ builder.SelectAll<Customer>().RawSql(", count(*) as TotalCount") // append total
 - .NET 7.0+
 
 ## Version History
-
+- 1.2.1
+    - Add prefix for missing Where, Join, Select, From, OrderBy methods.
+   
 - 1.2.0
     - Add NameConvention support
 
