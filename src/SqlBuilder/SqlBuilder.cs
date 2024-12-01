@@ -272,6 +272,7 @@ public class SqlBuilder
     /// <returns>The current SqlBuilder instance for method chaining</returns>
     public SqlBuilder Select<T>(Expression<Func<T, object>> propertyExpression, string? alias = null, string? prefix = null)
     {
+        prefix ??= GetTablePrefix(typeof(T), false);
         AppendSelect(Utils.EncodeColumn(propertyExpression, _nameConvention, prefix, alias, true));
         return this;
     }
@@ -332,6 +333,7 @@ public class SqlBuilder
     /// <returns>The current SqlBuilder instance for method chaining</returns>
     public SqlBuilder From<T>(string? prefix = null)
     {
+        prefix ??= GetTablePrefix(typeof(T), false);
         sqlBuilder.Append(" FROM ");
         sqlBuilder.Append(Utils.EncodeTable(typeof(T), _nameConvention, extraTableMapping.ContainsKey(typeof(T)) ? extraTableMapping[typeof(T)] : null, prefix ?? GetTablePrefix(typeof(T), false)))
             .AppendLine();
@@ -350,6 +352,7 @@ public class SqlBuilder
     /// <returns>The current SqlBuilder instance for method chaining</returns>
     public SqlBuilder Where<T, TResult>(Expression<Func<T, TResult>> propertyExpression, string value, string op = "=", string? prefix = null)
     {
+        prefix ??= GetTablePrefix(typeof(T), false);
         sqlBuilder.Append(" WHERE ");
         sqlBuilder.Append(Utils.EncodeColumn(propertyExpression, _nameConvention, prefix, null, false));
         sqlBuilder.Append(" ").Append(op).Append(" ").Append(value).AppendLine();
@@ -379,6 +382,7 @@ public class SqlBuilder
     /// <returns>The current SqlBuilder instance for method chaining</returns>
     public SqlBuilder And<T, TResult>(Expression<Func<T, TResult>> propertyExpression, string value, string op = "=", string? prefix = null)
     {
+        prefix ??= GetTablePrefix(typeof(T), false);
         sqlBuilder.Append(" AND ");
         sqlBuilder.Append(Utils.EncodeColumn(propertyExpression, _nameConvention, prefix, null, false));
         sqlBuilder.Append(" ").Append(op).Append(" ").Append(value).AppendLine();
@@ -408,6 +412,7 @@ public class SqlBuilder
     /// <returns>The current SqlBuilder instance for method chaining</returns>
     public SqlBuilder Or<T, TResult>(Expression<Func<T, TResult>> propertyExpression, string value, string op = "=", string? prefix = null)
     {
+        prefix ??= GetTablePrefix(typeof(T), false);
         sqlBuilder.Append(" OR ");
         sqlBuilder.Append(Utils.EncodeColumn(propertyExpression, _nameConvention, prefix, null, false));
         sqlBuilder.Append(" ").Append(op).Append(" ").Append(value).AppendLine();
@@ -437,6 +442,7 @@ public class SqlBuilder
     /// <returns>The current SqlBuilder instance for method chaining</returns>
     public SqlBuilder OrderBy<T, TResult>(Expression<Func<T, TResult>> propertyExpression, bool ascOrder = true, string? prefix = null)
     {
+        prefix ??= GetTablePrefix(typeof(T), false);
         sqlBuilder.Append(" ORDER BY ");
         sqlBuilder.Append(Utils.EncodeColumn(propertyExpression, _nameConvention, prefix, null, false));
         sqlBuilder.Append(" ").Append(ascOrder ? "ASC" : "DESC").AppendLine();
@@ -471,6 +477,8 @@ public class SqlBuilder
         string? rightPrefix,
         string op)
     {
+        leftPrefix ??= GetTablePrefix(typeof(TLeft), false);
+        rightPrefix ??= GetTablePrefix(typeof(TRight), false);
         sqlBuilder.Append(Utils.EncodeTable(
             typeof(TRight), _nameConvention, extraTableMapping.ContainsKey(typeof(TRight)) ? extraTableMapping[typeof(TRight)] : null, rightPrefix ?? GetTablePrefix(typeof(TRight), false)));
         sqlBuilder.Append(" ON ");
