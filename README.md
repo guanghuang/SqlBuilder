@@ -252,6 +252,10 @@ builder.SelectAll<Customer>().RawSql(", count(*) as TotalCount") // append total
 - .NET 7.0+
 
 ## Version History
+- 1.2.2
+    - Fix incorrect alias for snake case name convention.
+    - Add test project and cases.
+
 - 1.2.1
     - Add prefix for missing Where, Join, Select, From, OrderBy methods.
    

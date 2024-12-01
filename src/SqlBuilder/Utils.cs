@@ -178,7 +178,7 @@ public static class Utils
         if (propertyInfo == null)
             throw new ArgumentException("Expression must be a property");
 
-        return EncodeColumn(propertyInfo, nameConvention, prefix, alias, isAs);
+        return EncodeColumn(propertyInfo, nameConvention, prefix, alias ?? nameConvention.EscapeIdentifierName(propertyInfo.Name), isAs);
     }
 
     /// <summary>
