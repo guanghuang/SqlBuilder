@@ -52,6 +52,15 @@ public class SqlBuilder
     }
 
     /// <summary>
+    /// Creates a new instance of SqlBuilder with default settings from global configuration.
+    /// </summary>
+    /// <returns></returns>
+    public static SqlBuilder Create()
+    {
+        return new SqlBuilder();
+    }
+
+    /// <summary>
     /// Sets the global naming convention for all SqlBuilder instances.
     /// </summary>
     /// <param name="nameConvention">The naming convention to use</param>
@@ -179,6 +188,19 @@ public class SqlBuilder
     public SqlBuilder SelectAll<T>(Expression<Func<T, object>>? firstPropertyExpression, out string prefix)
     {
         return SelectAll(null, firstPropertyExpression, out prefix);
+    }
+
+    /// <summary>
+    /// Generates a SELECT * clause for a type, with a WHERE clause to filter by a specific property value.
+    /// </summary>
+    /// <typeparam name="T">The entity type</typeparam>
+    /// <typeparam name="TKey">The key type</typeparam>
+    /// <param name="propertyExpression">Property to place first in the selection</param>
+    /// <param name="value">The value to compare against</param>
+    /// <returns>The current SqlBuilder instance for method chaining</returns>
+    public SqlBuilder SelectFromWhere<T, TKey>(Expression<Func<T, TKey>> propertyExpression, string value)
+    {
+        return SelectAll<T>().From<T>().Where(propertyExpression, value);
     }
 
     /// <summary>

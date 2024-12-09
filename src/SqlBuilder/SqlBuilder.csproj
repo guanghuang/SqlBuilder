@@ -16,7 +16,7 @@
         <RepositoryUrl>https://github.com/guanghuang/SqlBuilder</RepositoryUrl>
         <PackageTags>Query;Sql;SqlBuilder</PackageTags>
         <Nullable>enable</Nullable>
-        <Version>1.2.2</Version>
+        <Version>1.2.3</Version>
         <Copyright>Copyright © 2024 Kvr.SqlBuilder. All rights reserved.</Copyright>
     </PropertyGroup>
     <ItemGroup>
