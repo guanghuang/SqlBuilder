@@ -149,6 +149,141 @@ public class SqlBuilder
     }
 
     /// <summary>
+    /// Adds a SELECT * clause for two types.
+    /// </summary>
+    /// <typeparam name="T">The first entity type</typeparam>
+    /// <typeparam name="T1">The second entity type</typeparam>
+    /// <returns>The current SqlBuilder instance for method chaining</returns>  
+    public SqlBuilder SelectAll<T, T1>() 
+    {
+        return SelectAll<T>().SelectAll<T1>();
+    }
+
+    /// <summary>
+    /// Adds a SELECT * clause for three types.
+    /// </summary>
+    /// <typeparam name="T">The first entity type</typeparam>
+    /// <typeparam name="T1">The second entity type</typeparam>
+    /// <typeparam name="T2">The third entity type</typeparam>
+    /// <returns>The current SqlBuilder instance for method chaining</returns>
+    public SqlBuilder SelectAll<T, T1, T2>() 
+    {
+        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>();
+    }
+
+    /// <summary>
+    /// Adds a SELECT * clause for four types.
+    /// </summary>
+    /// <typeparam name="T">The first entity type</typeparam>
+    /// <typeparam name="T1">The second entity type</typeparam>
+    /// <typeparam name="T2">The third entity type</typeparam>
+    /// <typeparam name="T3">The fourth entity type</typeparam>
+    /// <returns>The current SqlBuilder instance for method chaining</returns>
+    public SqlBuilder SelectAll<T, T1, T2, T3>() 
+    {
+        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>().SelectAll<T3>();
+    }
+
+    /// <summary>
+    /// Adds a SELECT * clause for five types.
+    /// </summary>
+    /// <typeparam name="T">The first entity type</typeparam>
+    /// <typeparam name="T1">The second entity type</typeparam>
+    /// <typeparam name="T2">The third entity type</typeparam>
+    /// <typeparam name="T3">The fourth entity type</typeparam>
+    /// <typeparam name="T4">The fifth entity type</typeparam>
+    /// <returns>The current SqlBuilder instance for method chaining</returns>
+    public SqlBuilder SelectAll<T, T1, T2, T3, T4>() 
+    {
+        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>().SelectAll<T3>().SelectAll<T4>();
+    }
+
+    /// <summary>
+    /// Adds a SELECT * clause for five types.
+    /// </summary>
+    /// <typeparam name="T">The first entity type</typeparam>
+    /// <typeparam name="T1">The second entity type</typeparam>
+    /// <typeparam name="T2">The third entity type</typeparam>
+    /// <typeparam name="T3">The fourth entity type</typeparam>
+    /// <typeparam name="T4">The fifth entity type</typeparam>
+    /// <typeparam name="T5">The sixth entity type</typeparam>
+    /// <returns>The current SqlBuilder instance for method chaining</returns>
+    public SqlBuilder SelectAll<T, T1, T2, T3, T4, T5>() 
+    {
+        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>().SelectAll<T3>().SelectAll<T4>().SelectAll<T5>();
+    }
+
+    /// <summary>
+    /// Adds a SELECT * clause for six types.
+    /// </summary>
+    /// <typeparam name="T">The first entity type</typeparam>
+    /// <typeparam name="T1">The second entity type</typeparam>
+    /// <typeparam name="T2">The third entity type</typeparam>
+    /// <typeparam name="T3">The fourth entity type</typeparam>
+    /// <typeparam name="T4">The fifth entity type</typeparam>
+    /// <typeparam name="T5">The sixth entity type</typeparam>
+    /// <typeparam name="T6">The seventh entity type</typeparam>
+    /// <returns>The current SqlBuilder instance for method chaining</returns>
+    public SqlBuilder SelectAll<T, T1, T2, T3, T4, T5, T6>() 
+    {
+        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>().SelectAll<T3>().SelectAll<T4>().SelectAll<T5>().SelectAll<T6>();
+    }
+
+    /// <summary>
+    /// Adds a SELECT * clause for seven types.
+    /// </summary>
+    /// <typeparam name="T">The first entity type</typeparam>
+    /// <typeparam name="T1">The second entity type</typeparam>
+    /// <typeparam name="T2">The third entity type</typeparam>
+    /// <typeparam name="T3">The fourth entity type</typeparam>
+    /// <typeparam name="T4">The fifth entity type</typeparam>
+    /// <typeparam name="T5">The sixth entity type</typeparam>
+    /// <typeparam name="T6">The seventh entity type</typeparam>
+    /// <typeparam name="T7">The eighth entity type</typeparam>
+    /// <returns>The current SqlBuilder instance for method chaining</returns>
+    public SqlBuilder SelectAll<T, T1, T2, T3, T4, T5, T6, T7>() 
+    {
+        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>().SelectAll<T3>().SelectAll<T4>().SelectAll<T5>().SelectAll<T6>().SelectAll<T7>();
+    }
+
+    /// <summary>
+    /// Adds a SELECT * clause for eight types.
+    /// </summary>
+    /// <typeparam name="T">The first entity type</typeparam>
+    /// <typeparam name="T1">The second entity type</typeparam>
+    /// <typeparam name="T2">The third entity type</typeparam>
+    /// <typeparam name="T3">The fourth entity type</typeparam>
+    /// <typeparam name="T4">The fifth entity type</typeparam>
+    /// <typeparam name="T5">The sixth entity type</typeparam>
+    /// <typeparam name="T6">The seventh entity type</typeparam>
+    /// <typeparam name="T7">The eighth entity type</typeparam>
+    /// <typeparam name="T8">The ninth entity type</typeparam>
+    /// <returns>The current SqlBuilder instance for method chaining</returns>
+    public SqlBuilder SelectAll<T, T1, T2, T3, T4, T5, T6, T7, T8>() 
+    {
+        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>().SelectAll<T3>().SelectAll<T4>().SelectAll<T5>().SelectAll<T6>().SelectAll<T7>().SelectAll<T8>();
+    }
+
+    /// <summary>
+    /// Adds a SELECT * clause for nine types.
+    /// </summary>
+    /// <typeparam name="T">The first entity type</typeparam>
+    /// <typeparam name="T1">The second entity type</typeparam>
+    /// <typeparam name="T2">The third entity type</typeparam>
+    /// <typeparam name="T3">The fourth entity type</typeparam>
+    /// <typeparam name="T4">The fifth entity type</typeparam>
+    /// <typeparam name="T5">The sixth entity type</typeparam>
+    /// <typeparam name="T6">The seventh entity type</typeparam>
+    /// <typeparam name="T7">The eighth entity type</typeparam>
+    /// <typeparam name="T8">The ninth entity type</typeparam>
+    /// <typeparam name="T9">The tenth entity type</typeparam>
+    /// <returns>The current SqlBuilder instance for method chaining</returns>
+    public SqlBuilder SelectAll<T, T1, T2, T3, T4, T5, T6, T7, T8, T9>() 
+    {
+        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>().SelectAll<T3>().SelectAll<T4>().SelectAll<T5>().SelectAll<T6>().SelectAll<T7>().SelectAll<T8>().SelectAll<T9>();
+    }
+
+    /// <summary>
     /// Adds a SELECT * clause for a type, with options to exclude specific columns and specify a first column.
     /// Uses the current naming convention for column formatting and generates a new table prefix.
     /// </summary>

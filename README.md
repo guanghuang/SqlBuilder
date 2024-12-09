@@ -68,14 +68,14 @@ public class Order
 }
 
 // Basic query
-var query = new SqlBuilder()
+var query = SqlBuilder.Create()
     .SelectAll<Customer>()
     .From<Customer>()
     .Build();
 // Result: SELECT [Id], [Name], [Email] FROM [Customers]
 
 // Join query with conditions
-var joinQuery = new SqlBuilder()
+var joinQuery = SqlBuilder.Create()
     .SelectAll<Customer>(out var customerPrefix)
     .SelectAll<Order>(out var orderPrefix)
     .From<Customer>()
@@ -103,7 +103,7 @@ SqlBuilder supports both singular and plural table names, with customization opt
 SqlBuilder.UseGlobalPluralTableNames();
 
 // Instance-specific setting
-var builder = new SqlBuilder()
+var builder = SqlBuilder.Create()
     .UsePluralTableNames()
     .SelectAll<Customer>()
     .From<Customer>();
@@ -120,22 +120,22 @@ Multiple ways to select columns:
 
 ```csharp
 // Select all columns
-builder.SelectAll<Customer>();
+SqlBuilder.Create().SelectAll<Customer>();
 
 // Return c.Id as first column, it is important for Dapper's splitOn parameter
-builder.SelectAll<Customer>(c => c.Id);
+SqlBuilder.Create().SelectAll<Customer>(c => c.Id);
 
 // Select specific columns
-builder.Select<Customer>(c => new[] { c.Id, c.Name });
+SqlBuilder.Create().Select<Customer>(c => new[] { c.Id, c.Name });
 
 // Select with alias
-builder.Select<Customer>(c => c.Name, "CustomerName");
+SqlBuilder.Create().Select<Customer>(c => c.Name, "CustomerName");
 
 // Exclude specific columns
-builder.SelectAll<Customer>(excludeColumns: new[] { c => c.Email });
+SqlBuilder.Create().SelectAll<Customer>(excludeColumns: new[] { c => c.Email });
 
 // Exclude specific column Email. Return c.Id as first column, it is important for Dapper's splitOn parameter
-builder.SelectAll<Customer>(excludeColumns: new[] { c => c.Email }, c => c.Id);
+SqlBuilder.Create().SelectAll<Customer>(excludeColumns: new[] { c => c.Email }, c => c.Id);
 
 ```
 
@@ -145,22 +145,22 @@ Support for various JOIN types:
 
 ```csharp
 // INNER JOIN
-builder.Join<Customer, Order, int>(
+SqlBuilder.Create().Join<Customer, Order, int>(
     customer => customer.Id,
     order => order.CustomerId);
 
 // LEFT JOIN
-builder.LeftJoin<Customer, Order, int>(
+SqlBuilder.Create().LeftJoin<Customer, Order, int>(
     customer => customer.Id,
     order => order.CustomerId);
 
 // RIGHT JOIN
-builder.RightJoin<Customer, Order, int>(
+SqlBuilder.Create().RightJoin<Customer, Order, int>(
     customer => customer.Id,
     order => order.CustomerId);
 
 // FULL JOIN
-builder.FullJoin<Customer, Order, int>(
+SqlBuilder.Create().FullJoin<Customer, Order, int>(
     customer => customer.Id,
     order => order.CustomerId);
 ```
@@ -170,7 +170,7 @@ builder.FullJoin<Customer, Order, int>(
 Building WHERE conditions:
 
 ```csharp
-builder
+    SqlBuilder.Create()
     .Where<Customer>(c => c.Id, "1")
     .And<Customer>(c => c.Name, "'John'")
     .Or<Customer>(c => c.Email, "'john@example.com'");
@@ -252,6 +252,9 @@ builder.SelectAll<Customer>().RawSql(", count(*) as TotalCount") // append total
 - .NET 7.0+
 
 ## Version History
+- 1.2.5
+    - Add `SelectAll` overload methods for more than 10 types.
+
 - 1.2.4
     - Add `SelectFrom` method to generate a SELECT * FROM clause.
 
