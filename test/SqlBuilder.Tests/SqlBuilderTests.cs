@@ -650,4 +650,104 @@ public class SqlBuilderTests
             "ORDER BY kvr1.city ASC",
             sql);
     }
+
+    [Fact]
+    public void SelectFromWhere_WithIntegerKey_GeneratesCorrectSql()
+    {
+        Kvr.SqlBuilder.SqlBuilder.UseGlobalNameConvention(SnakeCaseNameConvention.Create());
+        // Arrange
+        var builder = new Kvr.SqlBuilder.SqlBuilder();
+
+        // Act
+        var sql = builder
+            .SelectFromWhere<Customer, int>(c => c.Id, "1")
+            .Build();
+
+        // Assert
+        AssertSqlEqual(
+            "SELECT kvr0.id as Id, kvr0.first_name as FirstName, kvr0.last_name as LastName, kvr0.email as Email " +
+            "FROM customer kvr0 " +
+            "WHERE kvr0.id = 1",
+            sql);
+    }
+
+    [Fact]
+    public void SelectFromWhere_WithStringKey_GeneratesCorrectSql()
+    {
+        Kvr.SqlBuilder.SqlBuilder.UseGlobalNameConvention(SnakeCaseNameConvention.Create());
+        // Arrange
+        var builder = new Kvr.SqlBuilder.SqlBuilder();
+
+        // Act
+        var sql = builder
+            .SelectFromWhere<Customer, string>(c => c.Email, "'test@example.com'")
+            .Build();
+
+        // Assert
+        AssertSqlEqual(
+            "SELECT kvr0.id as Id, kvr0.first_name as FirstName, kvr0.last_name as LastName, kvr0.email as Email " +
+            "FROM customer kvr0 " +
+            "WHERE kvr0.email = 'test@example.com'",
+            sql);
+    }
+
+    [Fact]
+    public void SelectFromWhere_WithCustomerAddress_GeneratesCorrectSql()
+    {
+        Kvr.SqlBuilder.SqlBuilder.UseGlobalNameConvention(SnakeCaseNameConvention.Create());
+        // Arrange
+        var builder = new Kvr.SqlBuilder.SqlBuilder();
+
+        // Act
+        var sql = builder
+            .SelectFromWhere<CustomerAddress, int>(a => a.CustomerId, "1")
+            .Build();
+
+        // Assert
+        AssertSqlEqual(
+            "SELECT kvr0.address_id as AddressId, kvr0.customer_id as CustomerId, kvr0.street as Street, kvr0.city as City, kvr0.country as Country, kvr0.postal_code as PostalCode " +
+            "FROM customer_address kvr0 " +
+            "WHERE kvr0.customer_id = 1",
+            sql);
+    }
+
+    [Fact]
+    public void SelectFromWhere_WithTableAttribute_GeneratesCorrectSql()
+    {
+        Kvr.SqlBuilder.SqlBuilder.UseGlobalNameConvention(SnakeCaseNameConvention.Create());
+        // Arrange
+        var builder = new Kvr.SqlBuilder.SqlBuilder();
+
+        // Act
+        var sql = builder
+            .SelectFromWhere<Order, int>(o => o.OrderId, "1")
+            .Build();
+
+        // Assert
+        AssertSqlEqual(
+            "SELECT kvr0.order_id as OrderId, kvr0.customer_id as CustomerId, kvr0.amount as Amount, kvr0.order_date as OrderDate " +
+            "FROM OrderDetails kvr0 " +
+            "WHERE kvr0.order_id = 1",
+            sql);
+    }
+
+    [Fact]
+    public void SelectFromWhere_WithSnakeCase_GeneratesCorrectSql()
+    {
+        // Arrange
+        Kvr.SqlBuilder.SqlBuilder.UseGlobalNameConvention(SnakeCaseNameConvention.Create());
+        var builder = new Kvr.SqlBuilder.SqlBuilder();
+
+        // Act
+        var sql = builder
+            .SelectFromWhere<CustomerAddress, string>(a => a.PostalCode, "'12345'")
+            .Build();
+
+        // Assert
+        AssertSqlEqual(
+            "SELECT kvr0.address_id as AddressId, kvr0.customer_id as CustomerId, kvr0.street as Street, kvr0.city as City, kvr0.country as Country, kvr0.postal_code as PostalCode " +
+            "FROM customer_address kvr0 " +
+            "WHERE kvr0.postal_code = '12345'",
+            sql);
+    }
 } 

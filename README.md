@@ -252,6 +252,9 @@ builder.SelectAll<Customer>().RawSql(", count(*) as TotalCount") // append total
 - .NET 7.0+
 
 ## Version History
+- 1.2.3
+    - Add SelectFromWhere method to generate a SELECT * clause with a WHERE clause to filter by a specific property value.
+
 - 1.2.2
     - Fix incorrect alias for snake case name convention.
     - Add test project and cases.
