@@ -205,6 +205,16 @@ public class SqlBuilder
 
     /// <summary>
     /// Adds a SELECT * clause for a type.
+    /// </summary>
+    /// <typeparam name="T">The entity type</typeparam>
+    /// <returns>The current SqlBuilder instance for method chaining</returns>
+    public SqlBuilder SelectFrom<T>()
+    {
+        return SelectAll<T>().From<T>();
+    }
+
+    /// <summary>
+    /// Adds a SELECT * clause for a type.
     /// Uses the current naming convention for column formatting and generates a new table prefix.
     /// </summary>
     /// <typeparam name="T">The entity type</typeparam>
