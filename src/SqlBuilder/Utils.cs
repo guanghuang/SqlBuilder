@@ -95,8 +95,11 @@ public static class Utils
         var firstColumnName = firstColumn?.GetMemberExpression().Member.Name;
         var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
         var orderedProperties = properties
-            .Where(p => MappingTypes.Contains(p.PropertyType) && !excludeColumnNames.Contains(p.Name))
-            .OrderBy(p => firstColumnName != null && p.Name == firstColumnName ? 0 : 1);
+            .Where(p => MappingTypes.Contains(p.PropertyType) && !excludeColumnNames.Contains(p.Name));            
+        if (firstColumnName != null) 
+        {
+            orderedProperties = orderedProperties.OrderBy(p => p.Name == firstColumnName ? 0 : 1);
+        }
         var columns = orderedProperties.Select(p => EncodeColumn(p, nameConvention, prefix, nameConvention.EscapeIdentifierName(p.Name), true));
         return string.Join(", ", columns);
     }
