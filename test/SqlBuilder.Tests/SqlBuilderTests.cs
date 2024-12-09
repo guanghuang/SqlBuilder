@@ -750,4 +750,80 @@ public class SqlBuilderTests
             "WHERE kvr0.postal_code = '12345'",
             sql);
     }
+
+    [Fact]
+    public void SelectFrom_WithCustomer_GeneratesCorrectSql()
+    {
+        // Arrange
+        Kvr.SqlBuilder.SqlBuilder.UseGlobalNameConvention(SnakeCaseNameConvention.Create());
+        var builder = new Kvr.SqlBuilder.SqlBuilder();
+
+        // Act
+        var sql = builder
+            .SelectFrom<Customer>()
+            .Build();
+
+        // Assert
+        AssertSqlEqual(
+            "SELECT kvr0.id as Id, kvr0.first_name as FirstName, kvr0.last_name as LastName, kvr0.email as Email " +
+            "FROM customer kvr0",
+            sql);
+    }
+
+    [Fact]
+    public void SelectFrom_WithCustomerAddress_GeneratesCorrectSql()
+    {
+        // Arrange
+        Kvr.SqlBuilder.SqlBuilder.UseGlobalNameConvention(SnakeCaseNameConvention.Create());
+        var builder = new Kvr.SqlBuilder.SqlBuilder();
+
+        // Act
+        var sql = builder
+            .SelectFrom<CustomerAddress>()
+            .Build();
+
+        // Assert
+        AssertSqlEqual(
+            "SELECT kvr0.address_id as AddressId, kvr0.customer_id as CustomerId, kvr0.street as Street, kvr0.city as City, kvr0.country as Country, kvr0.postal_code as PostalCode " +
+            "FROM customer_address kvr0",
+            sql);
+    }
+
+    [Fact]
+    public void SelectFrom_WithTableAttribute_GeneratesCorrectSql()
+    {
+        // Arrange
+        Kvr.SqlBuilder.SqlBuilder.UseGlobalNameConvention(SnakeCaseNameConvention.Create());
+        var builder = new Kvr.SqlBuilder.SqlBuilder();
+
+        // Act
+        var sql = builder
+            .SelectFrom<Order>()
+            .Build();
+
+        // Assert
+        AssertSqlEqual(
+            "SELECT kvr0.order_id as OrderId, kvr0.customer_id as CustomerId, kvr0.amount as Amount, kvr0.order_date as OrderDate " +
+            "FROM OrderDetails kvr0",
+            sql);
+    }
+
+    [Fact]
+    public void SelectFrom_WithSnakeCase_GeneratesCorrectSql()
+    {
+        // Arrange
+        Kvr.SqlBuilder.SqlBuilder.UseGlobalNameConvention(SnakeCaseNameConvention.Create());
+        var builder = new Kvr.SqlBuilder.SqlBuilder();
+
+        // Act
+        var sql = builder
+            .SelectFrom<CustomerAddress>()
+            .Build();
+
+        // Assert
+        AssertSqlEqual(
+            "SELECT kvr0.address_id as AddressId, kvr0.customer_id as CustomerId, kvr0.street as Street, kvr0.city as City, kvr0.country as Country, kvr0.postal_code as PostalCode " +
+            "FROM customer_address kvr0",
+            sql);
+    }
 } 
