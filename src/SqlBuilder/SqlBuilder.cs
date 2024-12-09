@@ -153,10 +153,12 @@ public class SqlBuilder
     /// </summary>
     /// <typeparam name="T">The first entity type</typeparam>
     /// <typeparam name="T1">The second entity type</typeparam>
+    /// <param name="firstPropertyExpression">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression1">Property to place first in the selection</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>  
-    public SqlBuilder SelectAll<T, T1>() 
+    public SqlBuilder SelectAll<T, T1>(Expression<Func<T, object>>? firstPropertyExpression = null, Expression<Func<T1, object>>? firstPropertyExpression1 = null) 
     {
-        return SelectAll<T>().SelectAll<T1>();
+        return SelectAll<T>(firstPropertyExpression).SelectAll<T1>(firstPropertyExpression1);
     }
 
     /// <summary>
@@ -165,10 +167,13 @@ public class SqlBuilder
     /// <typeparam name="T">The first entity type</typeparam>
     /// <typeparam name="T1">The second entity type</typeparam>
     /// <typeparam name="T2">The third entity type</typeparam>
+    /// <param name="firstPropertyExpression">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression1">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression2">Property to place first in the selection</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder SelectAll<T, T1, T2>() 
+    public SqlBuilder SelectAll<T, T1, T2>(Expression<Func<T, object>>? firstPropertyExpression = null, Expression<Func<T1, object>>? firstPropertyExpression1 = null, Expression<Func<T2, object>>? firstPropertyExpression2 = null) 
     {
-        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>();
+        return SelectAll<T>(firstPropertyExpression).SelectAll<T1>(firstPropertyExpression1).SelectAll<T2>(firstPropertyExpression2);
     }
 
     /// <summary>
@@ -177,11 +182,15 @@ public class SqlBuilder
     /// <typeparam name="T">The first entity type</typeparam>
     /// <typeparam name="T1">The second entity type</typeparam>
     /// <typeparam name="T2">The third entity type</typeparam>
-    /// <typeparam name="T3">The fourth entity type</typeparam>
+    /// <typeparam name="T3">The fourth entity type</typeparam> 
+    /// <param name="firstPropertyExpression">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression1">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression2">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression3">Property to place first in the selection</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder SelectAll<T, T1, T2, T3>() 
+    public SqlBuilder SelectAll<T, T1, T2, T3>(Expression<Func<T, object>>? firstPropertyExpression = null, Expression<Func<T1, object>>? firstPropertyExpression1 = null, Expression<Func<T2, object>>? firstPropertyExpression2 = null, Expression<Func<T3, object>>? firstPropertyExpression3 = null) 
     {
-        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>().SelectAll<T3>();
+        return SelectAll<T>(firstPropertyExpression).SelectAll<T1>(firstPropertyExpression1).SelectAll<T2>(firstPropertyExpression2).SelectAll<T3>(firstPropertyExpression3);
     }
 
     /// <summary>
@@ -192,14 +201,19 @@ public class SqlBuilder
     /// <typeparam name="T2">The third entity type</typeparam>
     /// <typeparam name="T3">The fourth entity type</typeparam>
     /// <typeparam name="T4">The fifth entity type</typeparam>
+    /// <param name="firstPropertyExpression">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression1">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression2">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression3">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression4">Property to place first in the selection</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder SelectAll<T, T1, T2, T3, T4>() 
+    public SqlBuilder SelectAll<T, T1, T2, T3, T4>(Expression<Func<T, object>>? firstPropertyExpression = null, Expression<Func<T1, object>>? firstPropertyExpression1 = null, Expression<Func<T2, object>>? firstPropertyExpression2 = null, Expression<Func<T3, object>>? firstPropertyExpression3 = null, Expression<Func<T4, object>>? firstPropertyExpression4 = null) 
     {
-        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>().SelectAll<T3>().SelectAll<T4>();
+        return SelectAll<T>(firstPropertyExpression).SelectAll<T1>(firstPropertyExpression1).SelectAll<T2>(firstPropertyExpression2).SelectAll<T3>(firstPropertyExpression3).SelectAll<T4>(firstPropertyExpression4);
     }
 
     /// <summary>
-    /// Adds a SELECT * clause for five types.
+    /// Adds a SELECT * clause for six types.
     /// </summary>
     /// <typeparam name="T">The first entity type</typeparam>
     /// <typeparam name="T1">The second entity type</typeparam>
@@ -207,10 +221,16 @@ public class SqlBuilder
     /// <typeparam name="T3">The fourth entity type</typeparam>
     /// <typeparam name="T4">The fifth entity type</typeparam>
     /// <typeparam name="T5">The sixth entity type</typeparam>
+    /// <param name="firstPropertyExpression">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression1">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression2">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression3">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression4">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression5">Property to place first in the selection</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder SelectAll<T, T1, T2, T3, T4, T5>() 
+    public SqlBuilder SelectAll<T, T1, T2, T3, T4, T5>(Expression<Func<T, object>>? firstPropertyExpression = null, Expression<Func<T1, object>>? firstPropertyExpression1 = null, Expression<Func<T2, object>>? firstPropertyExpression2 = null, Expression<Func<T3, object>>? firstPropertyExpression3 = null, Expression<Func<T4, object>>? firstPropertyExpression4 = null, Expression<Func<T5, object>>? firstPropertyExpression5 = null) 
     {
-        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>().SelectAll<T3>().SelectAll<T4>().SelectAll<T5>();
+        return SelectAll<T>(firstPropertyExpression).SelectAll<T1>(firstPropertyExpression1).SelectAll<T2>(firstPropertyExpression2).SelectAll<T3>(firstPropertyExpression3).SelectAll<T4>(firstPropertyExpression4).SelectAll<T5>(firstPropertyExpression5);
     }
 
     /// <summary>
@@ -223,10 +243,17 @@ public class SqlBuilder
     /// <typeparam name="T4">The fifth entity type</typeparam>
     /// <typeparam name="T5">The sixth entity type</typeparam>
     /// <typeparam name="T6">The seventh entity type</typeparam>
+    /// <param name="firstPropertyExpression">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression1">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression2">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression3">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression4">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression5">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression6">Property to place first in the selection</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder SelectAll<T, T1, T2, T3, T4, T5, T6>() 
+    public SqlBuilder SelectAll<T, T1, T2, T3, T4, T5, T6>(Expression<Func<T, object>>? firstPropertyExpression = null, Expression<Func<T1, object>>? firstPropertyExpression1 = null, Expression<Func<T2, object>>? firstPropertyExpression2 = null, Expression<Func<T3, object>>? firstPropertyExpression3 = null, Expression<Func<T4, object>>? firstPropertyExpression4 = null, Expression<Func<T5, object>>? firstPropertyExpression5 = null, Expression<Func<T6, object>>? firstPropertyExpression6 = null) 
     {
-        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>().SelectAll<T3>().SelectAll<T4>().SelectAll<T5>().SelectAll<T6>();
+        return SelectAll<T>(firstPropertyExpression).SelectAll<T1>(firstPropertyExpression1).SelectAll<T2>(firstPropertyExpression2).SelectAll<T3>(firstPropertyExpression3).SelectAll<T4>(firstPropertyExpression4).SelectAll<T5>(firstPropertyExpression5).SelectAll<T6>(firstPropertyExpression6);
     }
 
     /// <summary>
@@ -240,10 +267,18 @@ public class SqlBuilder
     /// <typeparam name="T5">The sixth entity type</typeparam>
     /// <typeparam name="T6">The seventh entity type</typeparam>
     /// <typeparam name="T7">The eighth entity type</typeparam>
+    /// <param name="firstPropertyExpression">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression1">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression2">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression3">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression4">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression5">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression6">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression7">Property to place first in the selection</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder SelectAll<T, T1, T2, T3, T4, T5, T6, T7>() 
+    public SqlBuilder SelectAll<T, T1, T2, T3, T4, T5, T6, T7>(Expression<Func<T, object>>? firstPropertyExpression = null, Expression<Func<T1, object>>? firstPropertyExpression1 = null, Expression<Func<T2, object>>? firstPropertyExpression2 = null, Expression<Func<T3, object>>? firstPropertyExpression3 = null, Expression<Func<T4, object>>? firstPropertyExpression4 = null, Expression<Func<T5, object>>? firstPropertyExpression5 = null, Expression<Func<T6, object>>? firstPropertyExpression6 = null, Expression<Func<T7, object>>? firstPropertyExpression7 = null) 
     {
-        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>().SelectAll<T3>().SelectAll<T4>().SelectAll<T5>().SelectAll<T6>().SelectAll<T7>();
+        return SelectAll<T>(firstPropertyExpression).SelectAll<T1>(firstPropertyExpression1).SelectAll<T2>(firstPropertyExpression2).SelectAll<T3>(firstPropertyExpression3).SelectAll<T4>(firstPropertyExpression4).SelectAll<T5>(firstPropertyExpression5).SelectAll<T6>(firstPropertyExpression6).SelectAll<T7>(firstPropertyExpression7);
     }
 
     /// <summary>
@@ -258,10 +293,19 @@ public class SqlBuilder
     /// <typeparam name="T6">The seventh entity type</typeparam>
     /// <typeparam name="T7">The eighth entity type</typeparam>
     /// <typeparam name="T8">The ninth entity type</typeparam>
+    /// <param name="firstPropertyExpression">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression1">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression2">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression3">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression4">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression5">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression6">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression7">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression8">Property to place first in the selection</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder SelectAll<T, T1, T2, T3, T4, T5, T6, T7, T8>() 
+    public SqlBuilder SelectAll<T, T1, T2, T3, T4, T5, T6, T7, T8>(Expression<Func<T, object>>? firstPropertyExpression = null, Expression<Func<T1, object>>? firstPropertyExpression1 = null, Expression<Func<T2, object>>? firstPropertyExpression2 = null, Expression<Func<T3, object>>? firstPropertyExpression3 = null, Expression<Func<T4, object>>? firstPropertyExpression4 = null, Expression<Func<T5, object>>? firstPropertyExpression5 = null, Expression<Func<T6, object>>? firstPropertyExpression6 = null, Expression<Func<T7, object>>? firstPropertyExpression7 = null, Expression<Func<T8, object>>? firstPropertyExpression8 = null) 
     {
-        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>().SelectAll<T3>().SelectAll<T4>().SelectAll<T5>().SelectAll<T6>().SelectAll<T7>().SelectAll<T8>();
+        return SelectAll<T>(firstPropertyExpression).SelectAll<T1>(firstPropertyExpression1).SelectAll<T2>(firstPropertyExpression2).SelectAll<T3>(firstPropertyExpression3).SelectAll<T4>(firstPropertyExpression4).SelectAll<T5>(firstPropertyExpression5).SelectAll<T6>(firstPropertyExpression6).SelectAll<T7>(firstPropertyExpression7).SelectAll<T8>(firstPropertyExpression8);
     }
 
     /// <summary>
@@ -277,10 +321,20 @@ public class SqlBuilder
     /// <typeparam name="T7">The eighth entity type</typeparam>
     /// <typeparam name="T8">The ninth entity type</typeparam>
     /// <typeparam name="T9">The tenth entity type</typeparam>
+    /// <param name="firstPropertyExpression">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression1">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression2">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression3">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression4">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression5">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression6">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression7">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression8">Property to place first in the selection</param>
+    /// <param name="firstPropertyExpression9">Property to place first in the selection</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder SelectAll<T, T1, T2, T3, T4, T5, T6, T7, T8, T9>() 
+    public SqlBuilder SelectAll<T, T1, T2, T3, T4, T5, T6, T7, T8, T9>(Expression<Func<T, object>>? firstPropertyExpression = null, Expression<Func<T1, object>>? firstPropertyExpression1 = null, Expression<Func<T2, object>>? firstPropertyExpression2 = null, Expression<Func<T3, object>>? firstPropertyExpression3 = null, Expression<Func<T4, object>>? firstPropertyExpression4 = null, Expression<Func<T5, object>>? firstPropertyExpression5 = null, Expression<Func<T6, object>>? firstPropertyExpression6 = null, Expression<Func<T7, object>>? firstPropertyExpression7 = null, Expression<Func<T8, object>>? firstPropertyExpression8 = null, Expression<Func<T9, object>>? firstPropertyExpression9 = null) 
     {
-        return SelectAll<T>().SelectAll<T1>().SelectAll<T2>().SelectAll<T3>().SelectAll<T4>().SelectAll<T5>().SelectAll<T6>().SelectAll<T7>().SelectAll<T8>().SelectAll<T9>();
+        return SelectAll<T>(firstPropertyExpression).SelectAll<T1>(firstPropertyExpression1).SelectAll<T2>(firstPropertyExpression2).SelectAll<T3>(firstPropertyExpression3).SelectAll<T4>(firstPropertyExpression4).SelectAll<T5>(firstPropertyExpression5).SelectAll<T6>(firstPropertyExpression6).SelectAll<T7>(firstPropertyExpression7).SelectAll<T8>(firstPropertyExpression8).SelectAll<T9>(firstPropertyExpression9);
     }
 
     /// <summary>
