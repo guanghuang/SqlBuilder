@@ -252,6 +252,9 @@ builder.SelectAll<Customer>().RawSql(", count(*) as TotalCount") // append total
 - .NET 7.0+
 
 ## Version History
+- 1.2.7
+    - Update the code to support mix order of select and from. Previously, the order of select and from must be select first and from later. Now, the order of select and from could be mixed.
+
 - 1.2.6
     - Add `NotMappedAttribute` support for `SelectAll` method to exclude columns.
 
