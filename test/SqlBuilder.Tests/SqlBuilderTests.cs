@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE file in the project root for full license information.
 
 using System.Linq.Expressions;
+using System.ComponentModel.DataAnnotations.Schema;
 using Kvr.SqlBuilder;
 using Kvr.SqlBuilder.Convention;
 using SqlBuilder.Tests.Models;
@@ -825,5 +826,114 @@ public class SqlBuilderTests
             "SELECT kvr0.address_id as AddressId, kvr0.customer_id as CustomerId, kvr0.street as Street, kvr0.city as City, kvr0.country as Country, kvr0.postal_code as PostalCode " +
             "FROM customer_address kvr0",
             sql);
+    }
+
+    [Fact]
+    public void SelectAll_WithNotMappedAttribute_ExcludesNotMappedProperties()
+    {
+        // Arrange
+        Kvr.SqlBuilder.SqlBuilder.UseGlobalNameConvention(DefaultNameConvention.Create());
+        var builder = new Kvr.SqlBuilder.SqlBuilder();
+
+        // Act
+        var sql = builder
+            .SelectAll<EntityWithNotMapped>()
+            .From<EntityWithNotMapped>()
+            .Build();
+
+        // Assert
+        AssertSqlEqual(
+            "SELECT kvr0.Id as Id, kvr0.Name as Name " +
+            "FROM EntityWithNotMapped kvr0",
+            sql);
+    }
+
+    [Fact]
+    public void SelectAll_WithNotMappedAndSnakeCase_ExcludesNotMappedProperties()
+    {
+        // Arrange
+        Kvr.SqlBuilder.SqlBuilder.UseGlobalNameConvention(SnakeCaseNameConvention.Create());
+        var builder = new Kvr.SqlBuilder.SqlBuilder();
+
+        // Act
+        var sql = builder
+            .SelectAll<EntityWithNotMapped>()
+            .From<EntityWithNotMapped>()
+            .Build();
+
+        // Assert
+        AssertSqlEqual(
+            "SELECT kvr0.id as Id, kvr0.name as Name " +
+            "FROM entity_with_not_mapped kvr0",
+            sql);
+    }
+
+    [Fact]
+    public void SelectAll_WithNotMappedAndTableAttribute_ExcludesNotMappedProperties()
+    {
+        // Arrange
+        Kvr.SqlBuilder.SqlBuilder.UseGlobalNameConvention(DefaultNameConvention.Create());
+        var builder = new Kvr.SqlBuilder.SqlBuilder();
+
+        // Act
+        var sql = builder
+            .SelectAll<EntityWithNotMappedAndTable>()
+            .From<EntityWithNotMappedAndTable>()
+            .Build();
+
+        // Assert
+        AssertSqlEqual(
+            "SELECT kvr0.Id as Id, kvr0.Name as Name " +
+            "FROM CustomTableName kvr0",
+            sql);
+    }
+
+    [Fact]
+    public void SelectAll_WithNotMappedAndColumnAttribute_ExcludesNotMappedProperties()
+    {
+        // Arrange
+        Kvr.SqlBuilder.SqlBuilder.UseGlobalNameConvention(DefaultNameConvention.Create());
+        var builder = new Kvr.SqlBuilder.SqlBuilder();
+
+        // Act
+        var sql = builder
+            .SelectAll<EntityWithNotMappedAndColumn>()
+            .From<EntityWithNotMappedAndColumn>()
+            .Build();
+
+        // Assert
+        AssertSqlEqual(
+            "SELECT kvr0.custom_id as Id, kvr0.custom_name as Name " +
+            "FROM EntityWithNotMappedAndColumn kvr0",
+            sql);
+    }
+
+    private class EntityWithNotMapped
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        [NotMapped]
+        public string Description { get; set; } = string.Empty;
+        [NotMapped]
+        public DateTime CreatedDate { get; set; }
+    }
+
+    [Table("CustomTableName")]
+    private class EntityWithNotMappedAndTable
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        [NotMapped]
+        public string Description { get; set; } = string.Empty;
+    }
+
+    private class EntityWithNotMappedAndColumn
+    {
+        [Column("custom_id")]
+        public int Id { get; set; }
+        [Column("custom_name")]
+        public string Name { get; set; } = string.Empty;
+        [NotMapped]
+        public string Description { get; set; } = string.Empty;
     }
 } 
