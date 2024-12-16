@@ -97,19 +97,32 @@ public class SqlBuilder
     /// Appends a SELECT clause or column to the query.
     /// </summary>
     /// <param name="sql">The SQL fragment to append</param>
-    private void AppendSelect(string sql)
+    /// <param name="fromBegin">Whether to insert at the beginning of the SELECT clause. If true, will insert with comma if needed</param>
+    private void AppendSelect(string sql, bool fromBegin = false)
     {
         if (hasSelect)
         {
-            selectBuilder.Append(", ");
+            if (fromBegin)
+            {
+                selectBuilder.Insert(0, ", ");
+            }
+            else
+            {
+                selectBuilder.Append(", ");
+            }
         }
         else
         {
             hasSelect = true;
-            selectBuilder.Append("SELECT ");
         }
-
-        selectBuilder.Append(sql).AppendLine();
+        if (fromBegin)
+        {
+            selectBuilder.Insert(0, sql);
+        }
+        else
+        {
+            selectBuilder.Append(sql).AppendLine();
+        }
     }
 
     /// <summary>
@@ -143,11 +156,12 @@ public class SqlBuilder
     /// <param name="excludePropertyExpressions">Properties to exclude from the selection</param>
     /// <param name="firstPropertyExpression">Property to place first in the selection</param>
     /// <param name="prefix">Optional table prefix/alias</param>
+    /// <param name="fromBegin">Whether to insert at the beginning of the SELECT clause. If true, will insert with comma if needed</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder SelectAll<T>(Expression<Func<T, object>>[]? excludePropertyExpressions, Expression<Func<T, object>>? firstPropertyExpression, string? prefix = null)
+    public SqlBuilder SelectAll<T>(Expression<Func<T, object>>[]? excludePropertyExpressions, Expression<Func<T, object>>? firstPropertyExpression, string? prefix = null, bool fromBegin = false)
     {
         prefix ??= GetTablePrefix(typeof(T), false);
-        AppendSelect(Utils.GenerateSelectAllColumns(typeof(T), _nameConvention, excludePropertyExpressions, firstPropertyExpression, prefix));
+        AppendSelect(Utils.GenerateSelectAllColumns(typeof(T), _nameConvention, excludePropertyExpressions, firstPropertyExpression, prefix), fromBegin);
         return this;
     }
 
@@ -815,6 +829,6 @@ public class SqlBuilder
     /// <returns>The constructed SQL query</returns>
     public string Build()
     {
-        return selectBuilder.ToString() + fromBuilder.ToString();
+        return "SELECT " + selectBuilder + fromBuilder;
     }
 }

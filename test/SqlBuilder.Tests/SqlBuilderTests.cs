@@ -908,6 +908,50 @@ public class SqlBuilderTests
             sql);
     }
 
+    [Fact]
+    public void SelectAll_WithFromBeginTrue_GeneratesCorrectSql()
+    {
+        // Arrange
+        Kvr.SqlBuilder.SqlBuilder.UseGlobalNameConvention(DefaultNameConvention.Create());
+        var builder = new Kvr.SqlBuilder.SqlBuilder();
+
+        // Act
+        var sql = builder
+            .SelectAll<Order>()
+            .SelectAll<Customer>(null, null, fromBegin: true)
+            .From<Customer>()
+            .Build();
+
+        // Assert
+        AssertSqlEqual(
+            "SELECT kvr1.Id as Id, kvr1.FirstName as FirstName, kvr1.LastName as LastName, kvr1.Email as Email, " +
+            "kvr0.OrderId as OrderId, kvr0.CustomerId as CustomerId, kvr0.Amount as Amount, kvr0.OrderDate as OrderDate " +
+            "FROM Customer kvr1",
+            sql);
+    }
+
+    [Fact]
+    public void SelectAll_WithFromBeginFalse_GeneratesCorrectSql()
+    {
+        // Arrange
+        Kvr.SqlBuilder.SqlBuilder.UseGlobalNameConvention(DefaultNameConvention.Create());
+        var builder = new Kvr.SqlBuilder.SqlBuilder();
+
+        // Act
+        var sql = builder
+            .SelectAll<Order>()
+            .SelectAll<Customer>(null, null, fromBegin: false)
+            .From<Customer>()
+            .Build();
+
+        // Assert
+        AssertSqlEqual(
+            "SELECT kvr0.OrderId as OrderId, kvr0.CustomerId as CustomerId, kvr0.Amount as Amount, kvr0.OrderDate as OrderDate, " +
+            "kvr1.Id as Id, kvr1.FirstName as FirstName, kvr1.LastName as LastName, kvr1.Email as Email " +
+            "FROM Customer kvr1",
+            sql);
+    }
+
     private class EntityWithNotMapped
     {
         public int Id { get; set; }
