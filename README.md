@@ -252,6 +252,9 @@ builder.SelectAll<Customer>().RawSql(", count(*) as TotalCount") // append total
 - .NET 7.0+
 
 ## Version History
+- 1.2.6
+    - Add `NotMappedAttribute` support for `SelectAll` method to exclude columns.
+
 - 1.2.5
     - Add `SelectAll` overload methods for more than 10 types.
 

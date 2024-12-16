@@ -95,7 +95,9 @@ public static class Utils
         var firstColumnName = firstColumn?.GetMemberExpression().Member.Name;
         var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
         var orderedProperties = properties
-            .Where(p => MappingTypes.Contains(p.PropertyType) && !excludeColumnNames.Contains(p.Name));            
+            .Where(p => MappingTypes.Contains(p.PropertyType) && 
+                       !excludeColumnNames.Contains(p.Name) &&
+                       !p.GetCustomAttributes(typeof(NotMappedAttribute), false).Any());            
         if (firstColumnName != null) 
         {
             orderedProperties = orderedProperties.OrderBy(p => p.Name == firstColumnName ? 0 : 1);
