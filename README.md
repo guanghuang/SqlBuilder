@@ -252,6 +252,9 @@ builder.SelectAll<Customer>().RawSql(", count(*) as TotalCount") // append total
 - .NET 7.0+
 
 ## Version History
+- 1.2.7.1
+    - Add `fromBegin` parameter to `SelectAll` method to specify whether to insert at the beginning of the SELECT clause. If true, will insert with comma if needed.
+
 - 1.2.7
     - Update the code to support mix order of select and from. Previously, the order of select and from must be select first and from later. Now, the order of select and from could be mixed.
 
