@@ -39,8 +39,11 @@ public class SqlBuilder
     /// <summary>Maps types to their table prefixes/aliases</summary>
     private readonly Dictionary<Type, string> tablePrefixes = new();
     
-    /// <summary>StringBuilder instance for constructing the SQL query</summary>
-    private readonly StringBuilder sqlBuilder = new();
+    /// <summary>StringBuilder instance for constructing the SELECT part of the SQL query</summary>
+    private readonly StringBuilder selectBuilder = new();
+
+    /// <summary>StringBuilder instance for constructing the FROM and subsequent parts of the SQL query</summary>
+    private readonly StringBuilder fromBuilder = new();
 
     /// <summary>
     /// Initializes a new instance of SqlBuilder with default settings from global configuration.
@@ -98,15 +101,15 @@ public class SqlBuilder
     {
         if (hasSelect)
         {
-            sqlBuilder.Append(", ");
+            selectBuilder.Append(", ");
         }
         else
         {
             hasSelect = true;
-            sqlBuilder.Append("SELECT ");
+            selectBuilder.Append("SELECT ");
         }
 
-        sqlBuilder.Append(sql).AppendLine();
+        selectBuilder.Append(sql).AppendLine();
     }
 
     /// <summary>
@@ -545,7 +548,6 @@ public class SqlBuilder
         return this;
     }
 
-
     /// <summary>
     /// Adds a FROM clause to the query.
     /// </summary>
@@ -555,8 +557,8 @@ public class SqlBuilder
     public SqlBuilder From<T>(string? prefix = null)
     {
         prefix ??= GetTablePrefix(typeof(T), false);
-        sqlBuilder.Append(" FROM ");
-        sqlBuilder.Append(Utils.EncodeTable(typeof(T), _nameConvention, extraTableMapping.ContainsKey(typeof(T)) ? extraTableMapping[typeof(T)] : null, prefix ?? GetTablePrefix(typeof(T), false)))
+        fromBuilder.Append(" FROM ");
+        fromBuilder.Append(Utils.EncodeTable(typeof(T), _nameConvention, extraTableMapping.ContainsKey(typeof(T)) ? extraTableMapping[typeof(T)] : null, prefix ?? GetTablePrefix(typeof(T), false)))
             .AppendLine();
         return this;
     }
@@ -574,9 +576,9 @@ public class SqlBuilder
     public SqlBuilder Where<T, TResult>(Expression<Func<T, TResult>> propertyExpression, string value, string op = "=", string? prefix = null)
     {
         prefix ??= GetTablePrefix(typeof(T), false);
-        sqlBuilder.Append(" WHERE ");
-        sqlBuilder.Append(Utils.EncodeColumn(propertyExpression, _nameConvention, prefix, null, false));
-        sqlBuilder.Append(" ").Append(op).Append(" ").Append(value).AppendLine();
+        fromBuilder.Append(" WHERE ");
+        fromBuilder.Append(Utils.EncodeColumn(propertyExpression, _nameConvention, prefix, null, false));
+        fromBuilder.Append(" ").Append(op).Append(" ").Append(value).AppendLine();
         return this;
     }
 
@@ -587,7 +589,7 @@ public class SqlBuilder
     /// <returns>The current SqlBuilder instance for method chaining</returns>
     public SqlBuilder Where(string rawSql)
     {
-        sqlBuilder.Append(" WHERE ").Append(rawSql).AppendLine();
+        fromBuilder.Append(" WHERE ").Append(rawSql).AppendLine();
         return this;
     }
 
@@ -604,9 +606,9 @@ public class SqlBuilder
     public SqlBuilder And<T, TResult>(Expression<Func<T, TResult>> propertyExpression, string value, string op = "=", string? prefix = null)
     {
         prefix ??= GetTablePrefix(typeof(T), false);
-        sqlBuilder.Append(" AND ");
-        sqlBuilder.Append(Utils.EncodeColumn(propertyExpression, _nameConvention, prefix, null, false));
-        sqlBuilder.Append(" ").Append(op).Append(" ").Append(value).AppendLine();
+        fromBuilder.Append(" AND ");
+        fromBuilder.Append(Utils.EncodeColumn(propertyExpression, _nameConvention, prefix, null, false));
+        fromBuilder.Append(" ").Append(op).Append(" ").Append(value).AppendLine();
         return this;
     }
 
@@ -617,7 +619,7 @@ public class SqlBuilder
     /// <returns>The current SqlBuilder instance for method chaining</returns>
     public SqlBuilder And(string rawSql)
     {
-        sqlBuilder.Append(" AND ").Append(rawSql).AppendLine();
+        fromBuilder.Append(" AND ").Append(rawSql).AppendLine();
         return this;
     }
 
@@ -634,9 +636,9 @@ public class SqlBuilder
     public SqlBuilder Or<T, TResult>(Expression<Func<T, TResult>> propertyExpression, string value, string op = "=", string? prefix = null)
     {
         prefix ??= GetTablePrefix(typeof(T), false);
-        sqlBuilder.Append(" OR ");
-        sqlBuilder.Append(Utils.EncodeColumn(propertyExpression, _nameConvention, prefix, null, false));
-        sqlBuilder.Append(" ").Append(op).Append(" ").Append(value).AppendLine();
+        fromBuilder.Append(" OR ");
+        fromBuilder.Append(Utils.EncodeColumn(propertyExpression, _nameConvention, prefix, null, false));
+        fromBuilder.Append(" ").Append(op).Append(" ").Append(value).AppendLine();
         return this;
     }
 
@@ -647,10 +649,9 @@ public class SqlBuilder
     /// <returns>The current SqlBuilder instance for method chaining</returns>
     public SqlBuilder Or(string rawSql)
     {
-        sqlBuilder.Append(" OR ").Append(rawSql).AppendLine();
+        fromBuilder.Append(" OR ").Append(rawSql).AppendLine();
         return this;
     }
-
 
     /// <summary>
     /// Adds an ORDER BY clause to the query.
@@ -664,9 +665,9 @@ public class SqlBuilder
     public SqlBuilder OrderBy<T, TResult>(Expression<Func<T, TResult>> propertyExpression, bool ascOrder = true, string? prefix = null)
     {
         prefix ??= GetTablePrefix(typeof(T), false);
-        sqlBuilder.Append(" ORDER BY ");
-        sqlBuilder.Append(Utils.EncodeColumn(propertyExpression, _nameConvention, prefix, null, false));
-        sqlBuilder.Append(" ").Append(ascOrder ? "ASC" : "DESC").AppendLine();
+        fromBuilder.Append(" ORDER BY ");
+        fromBuilder.Append(Utils.EncodeColumn(propertyExpression, _nameConvention, prefix, null, false));
+        fromBuilder.Append(" ").Append(ascOrder ? "ASC" : "DESC").AppendLine();
         return this;
     }
 
@@ -678,7 +679,7 @@ public class SqlBuilder
     /// <returns>The current SqlBuilder instance for method chaining</returns>
     public SqlBuilder OrderBy(string rawSql, bool ascOrder = true)
     {
-        sqlBuilder.Append(" ORDER BY ").Append(rawSql).Append(" ").Append(ascOrder ? "ASC" : "DESC").AppendLine();
+        fromBuilder.Append(" ORDER BY ").Append(rawSql).Append(" ").Append(ascOrder ? "ASC" : "DESC").AppendLine();
         return this;
     }
 
@@ -700,11 +701,11 @@ public class SqlBuilder
     {
         leftPrefix ??= GetTablePrefix(typeof(TLeft), false);
         rightPrefix ??= GetTablePrefix(typeof(TRight), false);
-        sqlBuilder.Append(Utils.EncodeTable(
+        fromBuilder.Append(Utils.EncodeTable(
             typeof(TRight), _nameConvention, extraTableMapping.ContainsKey(typeof(TRight)) ? extraTableMapping[typeof(TRight)] : null, rightPrefix ?? GetTablePrefix(typeof(TRight), false)));
-        sqlBuilder.Append(" ON ");
-        sqlBuilder.Append(Utils.EncodeColumn(leftPropertyExpression, _nameConvention, leftPrefix ?? GetTablePrefix(typeof(TLeft), false), null, false));
-        sqlBuilder.Append(" ").Append(op).Append(" ")
+        fromBuilder.Append(" ON ");
+        fromBuilder.Append(Utils.EncodeColumn(leftPropertyExpression, _nameConvention, leftPrefix ?? GetTablePrefix(typeof(TLeft), false), null, false));
+        fromBuilder.Append(" ").Append(op).Append(" ")
             .Append(Utils.EncodeColumn(rightPropertyExpression, _nameConvention, rightPrefix ?? GetTablePrefix(typeof(TRight), false), null, false))
             .AppendLine();
         return this;
@@ -726,7 +727,7 @@ public class SqlBuilder
         string? rightPrefix = null,
         string op = "=")
     {
-        sqlBuilder.Append(" JOIN ");
+        fromBuilder.Append(" JOIN ");
         return BuildJoinClause(leftPropertyExpression, rightPropertyExpression, leftPrefix, rightPrefix, op);
     }
 
@@ -745,7 +746,7 @@ public class SqlBuilder
     public SqlBuilder LeftJoin<TLeft, TRight, TValue>(Expression<Func<TLeft, TValue>> leftPropertyExpression, Expression<Func<TRight, TValue>> rightPropertyExpression, string? leftPrefix = null,
         string? rightPrefix = null, string op = "=")
     {
-        sqlBuilder.Append(" LEFT JOIN ");
+        fromBuilder.Append(" LEFT JOIN ");
         return BuildJoinClause(leftPropertyExpression, rightPropertyExpression, leftPrefix, rightPrefix, op);
     }
 
@@ -765,7 +766,7 @@ public class SqlBuilder
         string? rightPrefix = null,
         string op = "=")
     {
-        sqlBuilder.Append(" RIGHT JOIN ");
+        fromBuilder.Append(" RIGHT JOIN ");
         return BuildJoinClause(leftPropertyExpression, rightPropertyExpression, leftPrefix, rightPrefix, op);
     }
 
@@ -785,7 +786,7 @@ public class SqlBuilder
         string? rightPrefix = null,
         string op = "=")
     {
-        sqlBuilder.Append(" FULL JOIN ");
+        fromBuilder.Append(" FULL JOIN ");
         return BuildJoinClause(leftPropertyExpression, rightPropertyExpression, leftPrefix, rightPrefix, op);
     }
 
@@ -793,10 +794,18 @@ public class SqlBuilder
     /// Appends raw SQL to the query.
     /// </summary>
     /// <param name="rawSql">The raw SQL string</param>
+    /// <param name="afterFrom">Whether to append the raw SQL after the FROM clause (defaults to true)</param>
     /// <returns>The current SqlBuilder instance for method chaining</returns>
-    public SqlBuilder RawSql(string rawSql)
+    public SqlBuilder RawSql(string rawSql, bool afterFrom = true)
     {
-        sqlBuilder.Append(rawSql);
+        if (afterFrom)
+        {
+            fromBuilder.Append(rawSql);
+        }
+        else
+        {
+            selectBuilder.Append(rawSql);
+        }
         return this;
     }
 
@@ -806,6 +815,6 @@ public class SqlBuilder
     /// <returns>The constructed SQL query</returns>
     public string Build()
     {
-        return sqlBuilder.ToString();
+        return selectBuilder.ToString() + fromBuilder.ToString();
     }
 }
