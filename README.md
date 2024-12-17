@@ -141,7 +141,7 @@ SqlBuilder.Create().SelectAll<Customer>(excludeColumns: new[] { c => c.Email }, 
 
 ### Joins
 
-Support for various JOIN types:
+Support for various JOIN types (Note: For joins, the left table must be used during sql building, otherwise will cause error):
 
 ```csharp
 // INNER JOIN
